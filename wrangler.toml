@@ -1,0 +1,12 @@
+#:schema node_modules/wrangler/config-schema.json
+name = "workers-firecrawl"
+main = "src/index.ts"
+compatibility_date = "2025-01-28"
+compatibility_flags = [ "nodejs_compat" ]
+workers_dev = true
+
+[observability]
+enabled = true
+
+[browser]
+binding = "BROWSER"

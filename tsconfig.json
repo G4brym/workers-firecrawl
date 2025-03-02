@@ -1,0 +1,33 @@
+{
+	"compilerOptions": {
+		/* Base Options: */
+		"esModuleInterop": true,
+		"skipLibCheck": true,
+		"target": "es2022",
+		"verbatimModuleSyntax": false,
+		"allowJs": true,
+		"resolveJsonModule": true,
+		"moduleDetection": "force",
+		/* Strictness */
+		"noImplicitAny": false,
+		"noImplicitThis": true,
+		"strictNullChecks": false,
+		"strict": true,
+		"noUncheckedIndexedAccess": true,
+		/* If NOT transpiling with TypeScript: */
+		"moduleResolution": "Bundler",
+		"module": "es2022",
+		"noEmit": true,
+		"lib": [
+			"DOM",
+			"es2022"
+		],
+		"types": [
+			"@types/node",
+			"@cloudflare/workers-types/experimental"
+		]
+	},
+	"include": [
+		"src"
+	]
+}
