@@ -1,14 +1,17 @@
 import { fromHono } from "chanfana";
 import { type Context, Hono } from "hono";
+import { authorizationMiddleware } from "./authorization";
 import { WebSearch } from "./webSearch";
 
 export type Env = {
 	BROWSER: Fetcher;
+	AUTHORIZATION_KEY?: string;
 };
 export type AppContext = Context<{ Bindings: Env }>;
 
 // Start a Hono app
 const app = new Hono();
+app.use("*", authorizationMiddleware);
 
 // Setup OpenAPI registry
 const openapi = fromHono(app, { docs_url: "/" });
