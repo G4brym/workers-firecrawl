@@ -69,6 +69,15 @@ via [GitHub Issues](https://github.com/G4brym/workers-firecrawl/issues).
    Open the URL in your browser to access a Swagger UI for testing the `/search` endpoint directly. Use this URL in your
    Firecrawl SDK configuration.
 
+6. **Authorization (Optional)**
+
+   By default, this worker will accept requests from everyone, so its recommended that you setup authorization,
+   For this, just set the `AUTHORIZATION_KEY` secret in your worker, with the desired api key you want to use.
+
+   ```bash
+   npx wrangler secret put AUTHORIZATION_KEY
+   ```
+
 ### Making Requests
 
 Integrate with the Firecrawl SDK by updating the `apiUrl` to your Worker’s URL:
@@ -77,7 +86,7 @@ Integrate with the Firecrawl SDK by updating the `apiUrl` to your Worker’s URL
 const {FirecrawlApp} = require('@mendable/firecrawl-js');
 
 const firecrawl = new FirecrawlApp({
-    apiKey: 'your-firecrawl-api-key', // Optional, depending on your setup
+    apiKey: 'your-api-key', // Only if AUTHORIZATION_KEY is defined in the worker
     apiUrl: 'https://workers-firecrawl.{your-user}.workers.dev'
 });
 
