@@ -71,7 +71,7 @@ async function extractContent(browser: Browser, url: string) {
 			body
 				.querySelectorAll("script, style, nav, header, footer")
 				.forEach((el) => el.remove());
-			const mainContent = body.textContent.trim();
+			const mainContent = body.outerHTML;
 
 			return {
 				title: pageTitle,
@@ -83,9 +83,8 @@ async function extractContent(browser: Browser, url: string) {
 			const anchors = Array.from(document.querySelectorAll("a"));
 			return anchors.map((a) => a.href).filter((a) => a !== "");
 		});
-		const rawHtml = await page.evaluate(() => {
-			return document;
-		});
+
+		const rawHtml = await page.content();
 
 		return {
 			title: title,
@@ -184,9 +183,6 @@ export class WebSearch extends OpenAPIRoute {
 	};
 
 	async handle(c: AppContext) {
-		//console.log(await c.req.raw.text())
-		//bthrow new Error(0)
-
 		const data = await this.getValidatedData<typeof this.schema>();
 
 		const browser = await getBrowser(c.env);

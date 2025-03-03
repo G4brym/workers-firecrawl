@@ -35,7 +35,9 @@
 			},
 			"complexity": {
 				"noStaticOnlyClass": "off",
-				"noBannedTypes": "off"
+				"noBannedTypes": "off",
+				"noForEach": "off",
+				"useOptionalChain": "off"
 			},
 			"a11y": {
 				"useButtonType": "off"
