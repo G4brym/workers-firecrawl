@@ -1,5 +1,7 @@
 # workers-firecrawl
 
+[![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/G4brym/workers-firecrawl)
+
 ## Overview
 
 `workers-firecrawl` is a Cloudflare Workers implementation of the Firecrawl API, specifically designed to replicate the
