@@ -109,9 +109,8 @@ async function extractContent(browser: Browser, url: string) {
 			},
 		};
 	} catch (error) {
-		throw new Error(
-			`Content extraction failed for ${url}: ${(error as Error).message}`,
-		);
+		console.error(`Content extraction failed for ${url}: ${(error as Error).message}`)
+		return null
 	} finally {
 		await page.close();
 	}
@@ -201,7 +200,7 @@ export class WebSearch extends OpenAPIRoute {
 
 		return {
 			success: true,
-			data: results,
+			data: results.filter((obj) => obj !== null),
 		};
 	}
 }

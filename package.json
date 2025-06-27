@@ -17,12 +17,10 @@
 	},
 	"devDependencies": {
 		"@biomejs/biome": "1.9.4",
-		"@cloudflare/vitest-pool-workers": "^0.6.12",
 		"@cloudflare/workers-types": "^4.20250204.0",
 		"@types/node": "^22.13.8",
 		"puppeteer": "^24.3.0",
 		"typescript": "^5.7.3",
-		"vitest": "2.1.9",
 		"wrangler": "^3.107.3"
 	},
 	"dependencies": {
