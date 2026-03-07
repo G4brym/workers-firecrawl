@@ -53,6 +53,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Create GitHub Release
+        if: steps.changesets.outputs.published == 'true'
         run: |
           VERSION=$(jq -r .version package.json)
           TAG="v${VERSION}"
@@ -60,7 +61,10 @@ jobs:
             echo "Release $TAG already exists, skipping."
           else
             # Extract changelog for this version (between ## $VERSION and the next ## heading)
-            BODY=$(awk "/^## ${VERSION}\$/{ found=1; next } /^## /{ if(found) exit } found" CHANGELOG.md)
+            BODY=""
+            if [ -f CHANGELOG.md ]; then
+              BODY=$(awk "/^## ${VERSION}\$/{ found=1; next } /^## /{ if(found) exit } found" CHANGELOG.md)
+            fi
             if [ -z "$BODY" ]; then
               BODY="See [CHANGELOG.md](https://github.com/G4brym/workers-firecrawl/blob/main/CHANGELOG.md) for details."
             fi
