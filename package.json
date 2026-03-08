@@ -3,7 +3,8 @@
 	"version": "0.0.1",
 	"description": "A Firecrawl compatible API implemented in Cloudflare Workers",
 	"scripts": {
-		"lint": "npx @biomejs/biome check src/ || (npx @biomejs/biome check --write src/; exit 1)"
+		"lint": "npx @biomejs/biome check src/ || (npx @biomejs/biome check --write src/; exit 1)",
+		"test": "vitest run --root tests"
 	},
 	"author": "Gabriel Massadas",
 	"license": "MIT",
@@ -17,10 +18,12 @@
 	},
 	"devDependencies": {
 		"@biomejs/biome": "1.9.4",
+		"@cloudflare/vitest-pool-workers": "^0.12.20",
 		"@cloudflare/workers-types": "^4.20250204.0",
 		"@types/node": "^22.13.8",
 		"puppeteer": "^24.3.0",
 		"typescript": "^5.7.3",
+		"vitest": "3.2.x",
 		"wrangler": "^3.107.3"
 	},
 	"dependencies": {
