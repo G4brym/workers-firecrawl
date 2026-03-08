@@ -109,8 +109,10 @@ async function extractContent(browser: Browser, url: string) {
 			},
 		};
 	} catch (error) {
-		console.error(`Content extraction failed for ${url}: ${(error as Error).message}`)
-		return null
+		console.error(
+			`Content extraction failed for ${url}: ${(error as Error).message}`,
+		);
+		return null;
 	} finally {
 		await page.close();
 	}
@@ -185,22 +187,26 @@ export class WebSearch extends OpenAPIRoute {
 		const data = await this.getValidatedData<typeof this.schema>();
 
 		const browser = await getBrowser(c.env);
-		const searchResults = await performSearch(
-			browser,
-			data.body.query,
-			data.body.limit,
-		);
+		try {
+			const searchResults = await performSearch(
+				browser,
+				data.body.query,
+				data.body.limit,
+			);
 
-		const promises = [];
-		for (const result of searchResults) {
-			promises.push(extractContent(browser, result));
+			const promises = [];
+			for (const result of searchResults) {
+				promises.push(extractContent(browser, result));
+			}
+
+			const results = await Promise.all(promises);
+
+			return {
+				success: true,
+				data: results.filter((obj) => obj !== null),
+			};
+		} finally {
+			await browser.close();
 		}
-
-		const results = await Promise.all(promises);
-
-		return {
-			success: true,
-			data: results.filter((obj) => obj !== null),
-		};
 	}
 }
