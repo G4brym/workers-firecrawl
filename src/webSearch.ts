@@ -96,7 +96,7 @@ async function extractContent(browser: Browser, url: string) {
 				/* customTranslators (optional) */ undefined,
 				/* customCodeBlockTranslators (optional) */ undefined,
 			),
-			html: rawHtml,
+			html: content,
 			rawHtml: rawHtml,
 			links: links,
 			screenshot: null,
