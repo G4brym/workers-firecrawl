@@ -103,7 +103,7 @@ async function extractContent(browser: Browser, url: string) {
 			metadata: {
 				title: title,
 				description: description,
-				sourceUrl: url,
+				sourceURL: url,
 				statusCode: statusCode,
 				error: null,
 			},
