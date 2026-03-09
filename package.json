@@ -18,6 +18,8 @@
 	},
 	"devDependencies": {
 		"@biomejs/biome": "1.9.4",
+		"@changesets/changelog-github": "^0.6.0",
+		"@changesets/cli": "^2.30.0",
 		"@cloudflare/vitest-pool-workers": "^0.12.20",
 		"@cloudflare/workers-types": "^4.20250204.0",
 		"@types/node": "^22.13.8",
