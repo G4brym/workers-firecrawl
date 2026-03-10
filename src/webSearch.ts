@@ -1,12 +1,8 @@
-import puppeteer, { type Browser } from "@cloudflare/puppeteer";
+import type { Browser } from "@cloudflare/puppeteer";
 import { OpenAPIRoute, contentJson } from "chanfana";
-import { NodeHtmlMarkdown } from "node-html-markdown";
 import { z } from "zod";
-import type { AppContext, Env } from "./index";
-
-async function getBrowser(env: Env): Promise<Browser> {
-	return await puppeteer.launch(env.BROWSER);
-}
+import { extractContent, getBrowser } from "./browser";
+import type { AppContext } from "./index";
 
 async function performSearch(browser: Browser, query: string, limit: number) {
 	const page = await browser.newPage();
@@ -29,90 +25,6 @@ async function performSearch(browser: Browser, query: string, limit: number) {
 		return urls.slice(0, limit); // Take top x organic results;
 	} catch (error) {
 		throw new Error(`Search failed: ${(error as Error).message}`);
-	} finally {
-		await page.close();
-	}
-}
-
-async function extractContent(browser: Browser, url: string) {
-	const page = await browser.newPage();
-	try {
-		const response = await page.goto(url, { waitUntil: "domcontentloaded" });
-		const statusCode = response ? response.status() : 0;
-
-		// Attempt to close popups
-		await page.evaluate(() => {
-			const closeButtons = Array.from(
-				document.querySelectorAll("button, a"),
-			).filter(
-				(el) =>
-					el.textContent.toLowerCase().includes("close") ||
-					el.textContent.includes("×"),
-			);
-			closeButtons.forEach((btn) => btn.click());
-		});
-		await page.waitForTimeout(1000); // Allow popups to close
-
-		// Extract title, description, and main content
-		const { title, description, content } = await page.evaluate(() => {
-			// Get page title
-			const pageTitle = document.title || "No title available";
-
-			// Get meta description
-			const metaDescription = document.querySelector(
-				'meta[name="description"]',
-			);
-			const descriptionText = metaDescription
-				? metaDescription.getAttribute("content")
-				: "No description available";
-
-			// Extract main content (simplified readability approach)
-			const body = document.body.cloneNode(true);
-			body
-				.querySelectorAll("script, style, nav, header, footer")
-				.forEach((el) => el.remove());
-			const mainContent = body.outerHTML;
-
-			return {
-				title: pageTitle,
-				description: descriptionText,
-				content: mainContent || "No content extracted",
-			};
-		});
-		const links = await page.evaluate(() => {
-			const anchors = Array.from(document.querySelectorAll("a"));
-			return anchors.map((a) => a.href).filter((a) => a !== "");
-		});
-
-		const rawHtml = await page.content();
-
-		return {
-			title: title,
-			description: description,
-			url: url,
-			markdown: NodeHtmlMarkdown.translate(
-				/* html */ content,
-				/* options (optional) */ {},
-				/* customTranslators (optional) */ undefined,
-				/* customCodeBlockTranslators (optional) */ undefined,
-			),
-			html: content,
-			rawHtml: rawHtml,
-			links: links,
-			screenshot: null,
-			metadata: {
-				title: title,
-				description: description,
-				sourceURL: url,
-				statusCode: statusCode,
-				error: null,
-			},
-		};
-	} catch (error) {
-		console.error(
-			`Content extraction failed for ${url}: ${(error as Error).message}`,
-		);
-		return null;
 	} finally {
 		await page.close();
 	}
