@@ -71,6 +71,7 @@ export class WebScrape extends OpenAPIRoute {
 				formats: data.body.formats,
 				onlyMainContent: data.body.onlyMainContent,
 				waitFor: data.body.waitFor,
+				timeout: data.body.timeout,
 				headers: data.body.headers,
 			});
 

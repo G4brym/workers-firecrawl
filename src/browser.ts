@@ -6,6 +6,7 @@ export interface ExtractOptions {
 	formats?: string[];
 	onlyMainContent?: boolean;
 	waitFor?: number;
+	timeout?: number;
 	headers?: Record<string, string>;
 }
 
@@ -21,6 +22,7 @@ export async function extractContent(
 	const formats = options?.formats;
 	const onlyMainContent = options?.onlyMainContent ?? true;
 	const waitFor = options?.waitFor;
+	const timeout = options?.timeout;
 	const headers = options?.headers;
 
 	const page = await browser.newPage();
@@ -29,7 +31,10 @@ export async function extractContent(
 			await page.setExtraHTTPHeaders(headers);
 		}
 
-		const response = await page.goto(url, { waitUntil: "domcontentloaded" });
+		const response = await page.goto(url, {
+			waitUntil: "domcontentloaded",
+			...(timeout !== undefined && { timeout }),
+		});
 		const statusCode = response ? response.status() : 0;
 
 		// Attempt to close popups
@@ -44,10 +49,9 @@ export async function extractContent(
 			closeButtons.forEach((btn) => btn.click());
 		});
 
+		await page.waitForTimeout(1000); // Allow popups to close
 		if (waitFor) {
 			await page.waitForTimeout(waitFor);
-		} else {
-			await page.waitForTimeout(1000); // Allow popups to close
 		}
 
 		// Extract title, description, and main content
