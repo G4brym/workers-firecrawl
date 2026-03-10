@@ -19,6 +19,7 @@ you’re ready to go!
 ## Features
 
 - **`/search` Endpoint**: Perform web searches and retrieve structured results, compatible with Firecrawl SDKs.
+- **`/scrape` Endpoint**: Scrape a single URL and extract content in multiple formats (markdown, HTML, links, screenshot).
 - **Cloudflare Browser Rendering**: Powers real-time web scraping and content extraction.
 - **Firecrawl SDK Compatibility**: Seamlessly integrates with existing Firecrawl-based applications.
 
@@ -95,6 +96,12 @@ const firecrawl = new FirecrawlApp({
 // Example search
 const results = await firecrawl.search('test query');
 console.log(results);
+
+// Example scrape
+const result = await firecrawl.scrapeUrl('https://example.com', {
+    formats: ['markdown', 'links'],
+});
+console.log(result);
 ```
 
 ### Customization
