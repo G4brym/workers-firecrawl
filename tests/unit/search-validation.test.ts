@@ -2,9 +2,8 @@ import { Hono } from "hono";
 import { OpenAPIRoute, fromHono } from "chanfana";
 import { describe, expect, it } from "vitest";
 import type { Env } from "../../src/index";
+import { DEFAULT_FORMATS } from "../../src/constants";
 import { z } from "zod";
-
-const DEFAULT_FORMATS = ["markdown", "html", "rawHtml", "links"];
 
 // Stub endpoint using the same schema as the real WebSearch endpoint
 // to test request validation without importing puppeteer/node-html-markdown
