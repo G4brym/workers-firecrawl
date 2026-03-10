@@ -1,8 +1,8 @@
 import { fromHono } from "chanfana";
 import { type Context, Hono } from "hono";
 import { authorizationMiddleware } from "./authorization";
-import { WebMap } from "./webMap";
 import { WebScrape } from "./scrape";
+import { WebMap } from "./webMap";
 import { WebSearch } from "./webSearch";
 
 export type Env = {
