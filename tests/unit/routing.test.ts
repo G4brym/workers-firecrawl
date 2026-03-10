@@ -29,11 +29,32 @@ class StubSearchEndpoint extends OpenAPIRoute {
 	}
 }
 
+class StubScrapeEndpoint extends OpenAPIRoute {
+	schema = {
+		request: {
+			body: {
+				content: {
+					"application/json": {
+						schema: z.object({
+							url: z.string().url(),
+						}),
+					},
+				},
+			},
+		},
+	};
+
+	async handle() {
+		return { success: true, data: {} };
+	}
+}
+
 function createApp() {
 	const app = new Hono<{ Bindings: Env }>();
 	app.use("*", authorizationMiddleware);
 	const openapi = fromHono(app, { docs_url: "/" });
 	openapi.post("/v1/search", StubSearchEndpoint);
+	openapi.post("/v1/scrape", StubScrapeEndpoint);
 	return app;
 }
 
@@ -78,5 +99,29 @@ describe("App Routing", () => {
 		expect(res.status).toBe(200);
 		const body = await res.json();
 		expect(body.success).toBe(true);
+	});
+
+	it("handles POST /v1/scrape route", async () => {
+		const app = createApp();
+		const res = await app.request(
+			"/v1/scrape",
+			{
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({ url: "https://example.com" }),
+			},
+			env,
+		);
+
+		expect(res.status).toBe(200);
+		const body = await res.json();
+		expect(body.success).toBe(true);
+	});
+
+	it("returns 404 for GET /v1/scrape (only POST is registered)", async () => {
+		const app = createApp();
+		const res = await app.request("/v1/scrape", { method: "GET" }, env);
+
+		expect(res.status).toBe(404);
 	});
 });
