@@ -2,6 +2,7 @@ import { Hono } from "hono";
 import { OpenAPIRoute, fromHono } from "chanfana";
 import { describe, expect, it } from "vitest";
 import type { Env } from "../../src/index";
+import { DEFAULT_FORMATS } from "../../src/constants";
 import { z } from "zod";
 
 // Stub endpoint using the same schema as the real WebSearch endpoint
@@ -45,11 +46,15 @@ class StubSearchEndpoint extends OpenAPIRoute {
 
 	async handle() {
 		const data = await this.getValidatedData<typeof this.schema>();
+		const formats = data.body.scrapeOptions?.formats ?? [
+			...DEFAULT_FORMATS,
+		];
 		return {
 			success: true,
 			data: [],
 			query: data.body.query,
 			limit: data.body.limit,
+			formats: formats,
 		};
 	}
 }
@@ -169,5 +174,147 @@ describe("Search Endpoint Validation", () => {
 		expect(res.status).toBe(200);
 		const body = await res.json();
 		expect(body.success).toBe(true);
+	});
+});
+
+describe("Format Filtering Validation", () => {
+	const env = {};
+
+	it("accepts request with specific formats and echoes them back", async () => {
+		const app = createApp();
+		const res = await app.request(
+			"/v1/search",
+			{
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({
+					query: "test",
+					scrapeOptions: { formats: ["markdown"] },
+				}),
+			},
+			env,
+		);
+
+		expect(res.status).toBe(200);
+		const body = await res.json();
+		expect(body.success).toBe(true);
+		expect(body.formats).toEqual(["markdown"]);
+	});
+
+	it("accepts request with screenshot format", async () => {
+		const app = createApp();
+		const res = await app.request(
+			"/v1/search",
+			{
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({
+					query: "test",
+					scrapeOptions: { formats: ["screenshot"] },
+				}),
+			},
+			env,
+		);
+
+		expect(res.status).toBe(200);
+		const body = await res.json();
+		expect(body.formats).toEqual(["screenshot"]);
+	});
+
+	it("accepts request with screenshot@fullPage format", async () => {
+		const app = createApp();
+		const res = await app.request(
+			"/v1/search",
+			{
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({
+					query: "test",
+					scrapeOptions: { formats: ["screenshot@fullPage"] },
+				}),
+			},
+			env,
+		);
+
+		expect(res.status).toBe(200);
+		const body = await res.json();
+		expect(body.formats).toEqual(["screenshot@fullPage"]);
+	});
+
+	it("accepts request with multiple formats", async () => {
+		const app = createApp();
+		const res = await app.request(
+			"/v1/search",
+			{
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({
+					query: "test",
+					scrapeOptions: { formats: ["markdown", "html", "screenshot"] },
+				}),
+			},
+			env,
+		);
+
+		expect(res.status).toBe(200);
+		const body = await res.json();
+		expect(body.formats).toEqual(["markdown", "html", "screenshot"]);
+	});
+
+	it("rejects request with invalid format", async () => {
+		const app = createApp();
+		const res = await app.request(
+			"/v1/search",
+			{
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({
+					query: "test",
+					scrapeOptions: { formats: ["invalid"] },
+				}),
+			},
+			env,
+		);
+
+		expect(res.status).toBe(400);
+		const body = await res.json();
+		expect(body.success).toBe(false);
+	});
+
+	it("returns default formats when scrapeOptions is omitted", async () => {
+		const app = createApp();
+		const res = await app.request(
+			"/v1/search",
+			{
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({ query: "test" }),
+			},
+			env,
+		);
+
+		expect(res.status).toBe(200);
+		const body = await res.json();
+		expect(body.formats).toEqual(DEFAULT_FORMATS);
+	});
+
+	it("returns default formats when formats array is omitted from scrapeOptions", async () => {
+		const app = createApp();
+		const res = await app.request(
+			"/v1/search",
+			{
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({
+					query: "test",
+					scrapeOptions: {},
+				}),
+			},
+			env,
+		);
+
+		expect(res.status).toBe(200);
+		const body = await res.json();
+		expect(body.formats).toEqual(DEFAULT_FORMATS);
 	});
 });

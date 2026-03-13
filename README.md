@@ -23,9 +23,41 @@ you’re ready to go!
 - **`/scrape` Endpoint**: Scrape a single URL and extract content in multiple formats (markdown, HTML, links, screenshot).
 - **Cloudflare Browser Rendering**: Powers real-time web scraping and content extraction.
 - **Firecrawl SDK Compatibility**: Seamlessly integrates with existing Firecrawl-based applications.
+- **Format Filtering**: Request only the content formats you need via `scrapeOptions.formats` to reduce payload size and improve performance.
+- **Screenshot Capture**: Capture viewport or full-page screenshots of search results as base64 data URIs.
 
 Additional endpoints or features can be requested
 via [GitHub Issues](https://github.com/G4brym/workers-firecrawl/issues).
+
+### Supported `scrapeOptions.formats`
+
+The `/v1/search` endpoint supports the `scrapeOptions.formats` parameter to control which content formats are returned per result. When omitted, the default formats are `["markdown", "html", "rawHtml", "links"]`.
+
+| Format | Description |
+|---|---|
+| `markdown` | Page content converted to Markdown |
+| `html` | Cleaned HTML content (scripts, styles, nav, header, footer removed) |
+| `rawHtml` | Full raw HTML of the page |
+| `links` | Array of all link URLs found on the page |
+| `screenshot` | Viewport screenshot as a `data:image/png;base64,...` data URI |
+| `screenshot@fullPage` | Full-page screenshot as a `data:image/png;base64,...` data URI |
+| `extract` | Accepted by the schema but not yet implemented (requires LLM integration) |
+
+**Example — request only markdown:**
+
+```javascript
+const results = await firecrawl.search('test query', {
+    scrapeOptions: { formats: ['markdown'] }
+});
+```
+
+**Example — request markdown with a screenshot:**
+
+```javascript
+const results = await firecrawl.search('test query', {
+    scrapeOptions: { formats: ['markdown', 'screenshot'] }
+});
+```
 
 ## Basic Usage
 

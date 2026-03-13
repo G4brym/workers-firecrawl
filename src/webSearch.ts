@@ -2,6 +2,7 @@ import type { Browser } from "@cloudflare/puppeteer";
 import { OpenAPIRoute, contentJson } from "chanfana";
 import { z } from "zod";
 import { extractContent, getBrowser } from "./browser";
+import { DEFAULT_FORMATS } from "./constants";
 import type { AppContext } from "./index";
 
 async function performSearch(browser: Browser, query: string, limit: number) {
@@ -75,17 +76,17 @@ export class WebSearch extends OpenAPIRoute {
 							title: z.string(),
 							description: z.string(),
 							url: z.string(),
-							markdown: z.string(),
-							html: z.string(),
-							rawHtml: z.string(),
-							links: z.string().array(),
-							screenshot: z.string(),
+							markdown: z.string().optional(),
+							html: z.string().optional(),
+							rawHtml: z.string().optional(),
+							links: z.string().array().optional(),
+							screenshot: z.string().optional().nullable(),
 							metadata: z.object({
 								title: z.string(),
 								description: z.string(),
 								sourceURL: z.string(),
 								statusCode: z.number().int(),
-								error: z.string(),
+								error: z.string().nullable(),
 							}),
 						})
 						.array(),
@@ -97,6 +98,7 @@ export class WebSearch extends OpenAPIRoute {
 
 	async handle(c: AppContext) {
 		const data = await this.getValidatedData<typeof this.schema>();
+		const formats = data.body.scrapeOptions?.formats ?? [...DEFAULT_FORMATS];
 
 		const browser = await getBrowser(c.env);
 		try {
@@ -108,7 +110,7 @@ export class WebSearch extends OpenAPIRoute {
 
 			const promises = [];
 			for (const result of searchResults) {
-				promises.push(extractContent(browser, result));
+				promises.push(extractContent(browser, result, { formats }));
 			}
 
 			const results = await Promise.all(promises);
